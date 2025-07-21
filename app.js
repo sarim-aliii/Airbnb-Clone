@@ -89,6 +89,9 @@ app.use((req, res, next) => {
 })
 
 
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
 
 app.use("/listings", listingRouter); // Restructuring listings
 app.use("/listings/:id/reviews", reviewRouter); // Restructuring reviews
