@@ -26,10 +26,10 @@
             display: none;
         }
         .tax-toggle{
+            margin-top: 2rem;
             border: 1px solid black;
             border-radius: 1rem;
-            height: 3.25rem;
-            padding: 1rem;
+            padding: 0.5rem 1rem;
             margin-left: 2rem;
             display: flex;
             align-items: center;
@@ -112,9 +112,10 @@
     <script>
         let taxSwitch = document.getElementById("flexSwitchCheckDefault");
         taxSwitch.addEventListener('click', () => {
-            let taxInfo = document.getElementById("tax-info");
-            for(let info of taxInfo){
-                if(info.style.display != "inline"){
+            let taxInfoElements = document.getElementsByClassName("tax-info");
+
+            for(let info of taxInfoElements){
+                if(info.style.display !== "inline"){
                     info.style.display = "inline";
                 }
                 else{
