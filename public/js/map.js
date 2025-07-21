@@ -1,6 +1,3 @@
-const listing = require("../")
-
-
 mapboxgl.accessToken = mapToken;   // from show.ejs
 const map = new mapboxgl.Map({
     container: 'map',
