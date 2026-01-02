@@ -4,7 +4,7 @@
     <h3 class="mb-4 fw-bold">My Trips ✈️</h3>
     
     <% if(bookings.length === 0) { %>
-        <div class="alert alert-light shadow-sm text-center p-5" role="alert">
+        <div class="text-center p-5 bg-light border rounded shadow-sm">
             <i class="fa-solid fa-suitcase-rolling fa-3x mb-3 text-muted"></i>
             <h5>No trips booked yet</h5>
             <p class="text-muted">Time to dust off your bags and start planning!</p>
@@ -17,7 +17,12 @@
                 <div class="col">
                     <div class="card trip-card h-100">
                         <div class="position-relative">
-                            <img src="<%= booking.listing.image.url %>" class="trip-img" alt="listing">
+                            <img 
+                                src="<%= booking.listing.image.url.replace('/upload/', '/upload/w_800,f_auto,q_auto/') %>" 
+                                class="trip-img" 
+                                alt="listing"
+                                loading="lazy"
+                            >
                             <span class="badge bg-success trip-status-badge">Confirmed</span>
                         </div>
                         

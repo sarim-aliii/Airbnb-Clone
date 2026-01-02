@@ -1,7 +1,11 @@
-if(process.env.NODE_ENV != "production"){
+if (process.env.NODE_ENV != "production") {
     require('dotenv').config();
 }
 
+
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const dotenv = require('dotenv');
+dotenv.config();
 
 const express = require('express');
 const app = express();
@@ -28,25 +32,25 @@ const bookingRouter = require("./routes/booking.js");
 
 
 const dbUrl = process.env.ATLASDB_URL;
-async function main(){
+async function main() {
     await mongoose.connect(dbUrl);
 }
 main()
-.then(() => console.log("Connection successful"))
-.catch(err => console.error(err));
+    .then(() => console.log("Connection successful"))
+    .catch(err => console.error(err));
 
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);         // for styling 
 app.use(express.static(path.join(__dirname, "/public")));      // to use static files from public folder
 
 
 const store = MongoStore.create({
-    mongoUrl: dbUrl, 
+    mongoUrl: dbUrl,
     crypto: {
         secret: process.env.SECRET,
     },
@@ -77,6 +81,38 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
+
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:8080/auth/google/callback" // Adjust port if needed
+},
+    async (accessToken, refreshToken, profile, done) => {
+        try {
+            // Check if user already exists
+            let user = await User.findOne({ googleId: profile.id });
+
+            if (user) {
+                return done(null, user);
+            }
+            else {
+                const newUser = new User({
+                    email: profile.emails[0].value,
+                    username: profile.emails[0].value,
+                    googleId: profile.id,
+                    isVerified: true // Trust Google users immediately
+                });
+
+                // We save directly since they don't need a password
+                await newUser.save();
+                return done(null, newUser);
+            }
+        } catch (err) {
+            return done(err);
+        }
+    }
+));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -110,11 +146,11 @@ app.all("*", (req, res, next) => {
 
 // Custom Error Handling - Middleware
 app.use((err, req, res, next) => {
-    let {status=500, message="Something went wrong!"} = err;
-    res.status(status).render("error.ejs", {message})
+    let { status = 500, message = "Something went wrong!" } = err;
+    res.status(status).render("error.ejs", { message })
 });
 
 
-app.listen(port, (req ,res) => {
+app.listen(port, (req, res) => {
     console.log(`Server is running on port ${port}`);
 });

@@ -1,19 +1,22 @@
 <style>
-  .search-btn{
+  .search-btn {
     background-color: #fe424d;
     color: white;
     border-radius: 25px;
     padding: 0 1rem 0 1rem;
   }
-  .search-btn:hover{
+
+  .search-btn:hover {
     background-color: #fe424d;
     color: white;
   }
-  .search-btn i{
+
+  .search-btn i {
     display: inline;
     margin-right: 0.5rem;
   }
-  .search-input{
+
+  .search-input {
     border-radius: 25px;
     padding: 0.5rem 3rem 0.5rem 3rem;
     font-size: 1rem;
@@ -41,16 +44,32 @@
 
       <div class="navbar-nav ms-auto">
         <a class="nav-link" href="/listings/new">Airbnb your home</a>
+
         <% if(!currUser){ %>
           <a class="nav-link" href="/signup"><b>Signup</b></a>
           <a class="nav-link" href="/login"><b>Login</b></a>
-        <% } %>  
-      
-        <% if(currUser){ %>
-          <a class="nav-link" href="/manage"><b>Manage Bookings</b></a>
-          <a class="nav-link" href="/trips"><b>My Trips</b></a>
-          <a class="nav-link" href="/logout"><b>Logout</b></a>
-        <% } %>  
+          <% } else { %>
+            <div class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <% if(currUser.image && currUser.image.url) { %>
+                  <img src="<%= currUser.image.url %>" class="rounded-circle me-2"
+                    style="width: 25px; height: 25px; object-fit: cover;">
+                  <% } %>
+                    <b>Account</b>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="/profile">My Profile</a></li>
+                <li><a class="dropdown-item" href="/manage">Host Dashboard</a></li>
+                <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
+                <li><a class="dropdown-item" href="/trips">My Trips</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+              </ul>
+            </div>
+            <% } %>
       </div>
 
     </div>

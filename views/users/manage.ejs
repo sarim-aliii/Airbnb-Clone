@@ -1,12 +1,11 @@
 <% layout("layouts/boilerplate") %>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div class="container mt-4 mb-5">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold">Host Dashboard 🗝️</h3>
-                <span class="badge bg-dark rounded-pill px-3 py-2"><%= bookings.length %> Pending Guests</span>
-            </div>
+            <h3 class="fw-bold mb-4">Host Dashboard 🗝️</h3>
 
             <% if(bookings.length === 0) { %>
                 <div class="text-center p-5 bg-light rounded-4">
@@ -15,7 +14,39 @@
                     <p class="text-muted">Your listings are waiting for their first guests!</p>
                 </div>
             <% } else { %>
-                
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm p-3">
+                            <h6 class="text-muted">Total Earnings</h6>
+                            <h2 class="text-success fw-bold">₹<%= totalEarnings.toLocaleString("en-IN") %></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm p-3">
+                            <h6 class="text-muted">Total Bookings</h6>
+                            <h2 class="text-dark fw-bold"><%= totalBookings %></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-8 mb-4">
+                        <div class="card border-0 shadow-sm p-4 h-100">
+                            <h5 class="card-title mb-4">Earnings Overview</h5>
+                            <canvas id="earningsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card border-0 shadow-sm p-4 h-100">
+                            <h5 class="card-title mb-4">Bookings per Property</h5>
+                            <canvas id="listingsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mb-3">Recent Bookings</h5>
                 <div class="card dashboard-card">
                     <div class="table-responsive">
                         <table class="table custom-table table-hover mb-0">
@@ -24,7 +55,7 @@
                                     <th scope="col" class="ps-4">Property</th>
                                     <th scope="col">Guest</th>
                                     <th scope="col">Dates</th>
-                                    <th scope="col">Earnings</th>
+                                    <th scope="col">Price</th>
                                     <th scope="col" class="text-end pe-4">Status</th>
                                 </tr>
                             </thead>
@@ -33,7 +64,12 @@
                                     <tr>
                                         <td class="ps-4">
                                             <div class="d-flex align-items-center">
-                                                <img src="<%= booking.listing.image.url %>" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <img 
+                                                    src="<%= booking.listing.image.url.replace('/upload/', '/upload/w_100,f_auto,q_auto/') %>" 
+                                                    class="rounded me-3" 
+                                                    style="width: 50px; height: 50px; object-fit: cover;"
+                                                    loading="lazy"
+                                                >
                                                 <a href="/listings/<%= booking.listing._id %>" class="text-dark fw-bold text-decoration-none">
                                                     <%= booking.listing.title %>
                                                 </a>
@@ -41,31 +77,75 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="user-avatar">
+                                                <div class="user-avatar text-center me-2" style="width: 30px; height: 30px; background-color: #ddd; border-radius: 50%; line-height: 30px;">
                                                     <%= booking.author.username.charAt(0).toUpperCase() %>
                                                 </div>
                                                 <span><%= booking.author.username %></span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="small">
-                                                <i class="fa-regular fa-calendar me-1 text-muted"></i>
-                                                <%= booking.checkIn.toLocaleDateString('en-US', {month:'short', day:'numeric'}) %> - 
-                                                <%= booking.checkOut.toLocaleDateString('en-US', {month:'short', day:'numeric'}) %>
+                                            <div class="small text-muted">
+                                                <%= new Date(booking.checkIn).toLocaleDateString('en-US', {month:'short', day:'numeric'}) %> - 
+                                                <%= new Date(booking.checkOut).toLocaleDateString('en-US', {month:'short', day:'numeric'}) %>
                                             </div>
                                         </td>
-                                        <td>
-                                            <span class="fw-bold text-success">₹<%= booking.totalPrice.toLocaleString("en-IN") %></span>
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            <span class="badge bg-success rounded-pill px-3">Confirmed</span>
-                                        </td>
+                                        <td><span class="fw-bold text-success">₹<%= booking.totalPrice.toLocaleString("en-IN") %></span></td>
+                                        <td class="text-end pe-4"><span class="badge bg-success rounded-pill px-3">Confirmed</span></td>
                                     </tr>
                                 <% } %>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
+                <script>
+                    // 1. Prepare Data from EJS
+                    const earningsData = <%- JSON.stringify(earningsData) %>;
+                    const listingStats = <%- JSON.stringify(listingStats) %>;
+
+                    // 2. Earnings Chart (Line)
+                    const ctx1 = document.getElementById('earningsChart').getContext('2d');
+                    new Chart(ctx1, {
+                        type: 'line',
+                        data: {
+                            labels: Object.keys(earningsData),
+                            datasets: [{
+                                label: 'Earnings (₹)',
+                                data: Object.values(earningsData),
+                                borderColor: '#fe424d',
+                                backgroundColor: 'rgba(254, 66, 77, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+
+                    // 3. Listings Chart (Doughnut)
+                    const ctx2 = document.getElementById('listingsChart').getContext('2d');
+                    new Chart(ctx2, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(listingStats),
+                            datasets: [{
+                                data: Object.values(listingStats),
+                                backgroundColor: [
+                                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                </script>
 
             <% } %>
         </div>
