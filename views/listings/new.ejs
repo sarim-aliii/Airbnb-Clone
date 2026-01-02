@@ -52,6 +52,41 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="guestCapacity" class="form-label">Guests</label>
+                    <input name="listing[guestCapacity]" type="number" class="form-control" value="1" min="1" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Amenities</label>
+                    <div class="row">
+                        <div class="col-6 col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Wifi" id="wifi">
+                                <label class="form-check-label" for="wifi">Wifi</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="AC" id="ac">
+                                <label class="form-check-label" for="ac">AC</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Pool" id="pool">
+                                <label class="form-check-label" for="pool">Pool</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Parking" id="parking">
+                                <label class="form-check-label" for="parking">Parking</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
                     <label for="category" class="form-label">Category</label>
                     <select name="listing[category]" class="form-select" required>
                         <option value="" selected disabled>Select a category</option>

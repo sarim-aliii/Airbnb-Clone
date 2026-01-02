@@ -1,42 +1,77 @@
 const Listing = require("../models/listing");
 const Booking = require("../models/booking");
 
-
 // Map Services
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
-
 module.exports.index = async (req, res) => {
+    // 1. Destructure all filter parameters from the URL
+    let { search, category, min_price, max_price, guests, amenities } = req.query;
     let query = {};
-    const { search, category } = req.query;
 
+    // 2. Search Filter (Title, Location, Country)
     if (search) {
-        // Create a regex for fuzzy matching (case insensitive)
         const regex = new RegExp(search, 'i');
-        query = { 
-            $or: [
-                { title: regex }, 
-                { location: regex }, 
-                { country: regex } 
-            ] 
-        };
+        query.$or = [
+            { title: regex }, 
+            { location: regex }, 
+            { country: regex } 
+        ];
     }
 
-    if (category) {
+    // 3. Category Filter
+    if (category && category !== "undefined") {
         query.category = category;
     }
 
-    const allListings = await Listing.find(query);
-    res.render("listings/index.ejs", { allListings });
-}
+    // 4. Price Range Filter
+    // We strictly convert to Number() to avoid string comparison errors
+    if (min_price || max_price) {
+        query.price = {};
+        if (min_price) query.price.$gte = Number(min_price);
+        if (max_price) query.price.$lte = Number(max_price);
+    }
 
+    // 5. Guest Capacity Filter
+    if (guests) {
+        query.guestCapacity = { $gte: Number(guests) };
+    }
+
+    // 6. Amenities Filter
+    if (amenities) {
+        // Ensure it's an array (if user checks only 1 box, it comes as a string)
+        const amenitiesList = Array.isArray(amenities) ? amenities : [amenities];
+        query.amenities = { $all: amenitiesList };
+    }
+
+    // 7. Fetch Listings
+    const allListings = await Listing.find(query);
+
+    // 8. Prepare data to send back to View (to keep inputs filled)
+    let amenitiesForView = [];
+    if (amenities) {
+        amenitiesForView = Array.isArray(amenities) ? amenities : [amenities];
+    }
+
+    // 9. Render View with BOTH 'allListings' AND 'values'
+    res.render("listings/index.ejs", { 
+        allListings, 
+        values: { 
+            search, 
+            category, 
+            min_price, 
+            max_price, 
+            guests, 
+            amenities: amenitiesForView 
+        } 
+    });
+}
 
 module.exports.new = (req, res) => {
     res.render("listings/new.ejs");
 }
-
 
 module.exports.show = async (req, res) => {
     let { id } = req.params;
@@ -50,13 +85,9 @@ module.exports.show = async (req, res) => {
         res.redirect("/listings");
     }
 
-    // Fetch all bookings for this listing
     const bookings = await Booking.find({ listing: id });
-
-    // Pass 'bookings' to the view
     res.render("listings/show.ejs", { listing, bookings }); 
 }
-
 
 module.exports.create = async (req, res, next) => {
     let response = await geocodingClient.forwardGeocode({
@@ -69,7 +100,6 @@ module.exports.create = async (req, res, next) => {
     let filename = req.file.filename;
 
     const newListing = new Listing(req.body.listing);
-
     newListing.owner = req.user._id;
     newListing.image = { url, filename };
     newListing.geometry = response.body.features[0].geometry;
@@ -78,7 +108,6 @@ module.exports.create = async (req, res, next) => {
     req.flash("success", "New Listing Created!");
     res.redirect("/listings");
 }
-
 
 module.exports.edit = async (req, res) => {
     let { id } = req.params;
@@ -95,16 +124,13 @@ module.exports.edit = async (req, res) => {
     res.render("listings/edit.ejs", { listing, originalImageUrl });
 }
 
-
 module.exports.update = async (req, res) => {
     let {id} = req.params;
-    let listing = await Listing.findByIdAndUpdate
-    (id, {...req.body.listing});
+    let listing = await Listing.findByIdAndUpdate(id, {...req.body.listing});
 
     if(typeof req.file !== 'undefined'){
         let url = req.file.path;
         let filename = req.file.filename;
-
         listing.image = {url, filename};
         await listing.save();
     }
@@ -112,7 +138,6 @@ module.exports.update = async (req, res) => {
     req.flash("success", "Listing Updated!");
     res.redirect(`/listings/${id}`);
 }
-
 
 module.exports.delete = async (req, res) => {
     let {id} = req.params;

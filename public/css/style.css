@@ -1,285 +1,308 @@
-body{
-    font-family: "Plus Jakarta Sana", sans-serif !important;
+/* -------------------------------------------------------------------------- */
+/* 1. VARIABLES                                */
+/* -------------------------------------------------------------------------- */
+:root {
+    --primary-color: #ff385c;
+    /* Airbnb-ish vibrant red/pink */
+    --secondary-color: #d90b3e;
+    --text-dark: #222222;
+    --text-light: #717171;
+    --bg-light: #f7f7f7;
+    /* Soft grey background for contrast */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --shadow-sm: 0 6px 15px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 15px 30px rgba(0, 0, 0, 0.1);
+    --radius-xl: 1.5rem;
+    --radius-lg: 1rem;
+}
+
+body {
+    font-family: "Plus Jakarta Sans", sans-serif !important;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-} 
+    background-color: #ffffff;
+    color: var(--text-dark);
+}
 
-.container{
+.container {
     flex: 1;
 }
 
-.navbar{
+/* -------------------------------------------------------------------------- */
+/* 2. NAVBAR                                  */
+/* -------------------------------------------------------------------------- */
+/* Glassmorphism Effect */
+.navbar {
     height: 5rem;
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    /* The "Frosted Glass" effect */
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand .fa-airbnb {
+    color: var(--primary-color);
+    font-size: 2.2rem;
+}
+
+.nav-link {
+    color: var(--text-dark) !important;
+    font-weight: 500;
+    margin: 0 0.5rem;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Search Bar Styling */
+.search-input {
+    background-color: #f7f7f7;
+    border: 1px solid transparent;
+    border-radius: 50px;
+    padding: 0.7rem 3rem 0.7rem 1.5rem;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+}
+
+.search-input:focus {
     background-color: white;
+    border-color: #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.fa-airbnb{
-    color: #fe424d;
-    font-size: 2rem;
-}
-
-/* !important : to overpower custom styling of bootstrap */
-.nav-link{
-    color: #222222 !important;
-}
-
-
-/* Footer */
-.f-info-links a{
-    text-decoration: none;
-    color: #222222;
-    margin-right: 1rem;
-    opacity: 0.7;
-}
-.f-info-links a:hover{
-    text-decoration: underline;
-    opacity: 1;
-}
-.f-info-links, .f-info-socials, .f-info-brand{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.f-info-socials i{
-    font-size: 1.2rem;
-    margin-right: 2rem;
-}
-
-.f-info{
-    height: 8rem;
-    display: flex;
-    background-color: #ebebeb;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: space-evenly;
-    text-align: center;
-}
-
-
-
-/* Cards */
-.listing-card{
-    border: none !important;
-    margin-bottom: 2rem;
-}
-
-.card-img-top{
-    border-radius: 1rem !important;
-    width: 100% !important;
-    object-fit: cover !important;
-}
-
-.card-body{
-    padding: 0 !important;
-}
-
-.card-text p{
-    font-weight: 400;
-}
-
-
-.listing-link{
-    text-decoration: none;
-}
-
-
-/* Card Effect */
-.card-img-overlay{
-    opacity: 0;
-}
-.card-img-overlay:hover{
-    opacity: 0.2;
-    background-color: #fff;
-}
-
-
-/* Style Add/Edit button on new listing */
-.add-btn, .edit-btn{
-    background-color: #fe424d !important;
-    border: none !important;
-}
-
-
-/* Style Listing Page */
-.show-img{
-    height: 30vh;
-}
-.btns{
-    display: flex;
-}
-.show-card{
-    padding-left: 0;
-    padding-right: 0;
-}
-
-
-/* Map */
-#map{ 
-    height: 400px;
-    width: 80vh; 
-}
-
-
-/* Landing Page Hero Section */
-.hero-container {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
-    background-size: cover;
-    background-position: center;
-    height: 80vh; /* Takes up 80% of the screen height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.search-btn {
+    background-color: var(--primary-color);
     color: white;
-    text-align: center;
-    border-radius: 1rem;
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+    border-radius: 50px;
+    padding: 0 1.2rem;
+    margin-left: -40px;
+    /* Overlap button */
+    z-index: 10;
+    font-weight: 600;
 }
 
-.hero-title {
-    font-size: 4rem;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+.search-btn:hover {
+    background-color: var(--secondary-color);
+    color: white;
 }
 
-.hero-subtitle {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.hero-btn {
-    padding: 0.8rem 2rem;
-    font-size: 1.2rem;
-    border-radius: 25px;
-}
-
-
-/* 1. Global Animations */
-.hover-effect {
-    transition: all 0.3s ease-in-out;
-}
-.hover-effect:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-}
-
-/* 2. Hero Section (Home) */
+/* -------------------------------------------------------------------------- */
+/* 3. HERO SECTION                                */
+/* -------------------------------------------------------------------------- */
 .hero-container {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    /* High quality travel image */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)),
+        url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
     height: 85vh;
     background-size: cover;
     background-position: center;
-    border-radius: 1.5rem;
+    border-radius: var(--radius-xl);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: white;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-md);
     position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
 }
 
 .hero-title {
-    font-size: 5rem;
+    font-size: 5.5rem;
     font-weight: 800;
     letter-spacing: -2px;
-    margin-bottom: 1rem;
-    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: fadeInDown 1s ease-out;
 }
 
 .hero-subtitle {
-    font-size: 1.5rem;
-    font-weight: 300;
+    font-size: 1.6rem;
+    font-weight: 400;
     margin-bottom: 2.5rem;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 1s ease-out 0.3s both;
+    /* Slight delay */
 }
 
-/* 3. Feature Cards (Home) */
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. CARDS                                    */
+/* -------------------------------------------------------------------------- */
+.listing-card {
+    border: none !important;
+    background: transparent;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.card-img-top {
+    border-radius: var(--radius-lg) !important;
+    width: 100% !important;
+    height: 20rem;
+    /* Fallback */
+    aspect-ratio: 1 / 0.95;
+    /* Modern square-ish aspect ratio */
+    object-fit: cover !important;
+    filter: brightness(0.95);
+    transition: filter 0.3s, transform 0.5s;
+}
+
+.listing-card:hover .card-img-top {
+    filter: brightness(1.05);
+    transform: scale(1.02);
+    /* Subtle zoom */
+    box-shadow: var(--shadow-md);
+}
+
+.card-body {
+    padding: 0.8rem 0 !important;
+}
+
+.card-text b {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.listing-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Feature Cards (Home Page) */
 .feature-card {
     background: white;
-    border: none;
-    border-radius: 1rem;
-    padding: 2rem;
+    border: 1px solid #f0f0f0;
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: 0.3s;
+    box-shadow: var(--shadow-sm);
+    transition: 0.4s ease;
 }
+
 .feature-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-md);
+    border-color: transparent;
 }
+
 .feature-icon {
     font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #fe424d;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #ff385c 0%, #bd1e59 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* 4. Trip Cards (My Trips) */
-.trip-card {
-    border: none;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: 0.3s;
+/* -------------------------------------------------------------------------- */
+/* 5. FOOTER                                   */
+/* -------------------------------------------------------------------------- */
+.f-info {
+    background-color: #f7f7f7;
+    border-top: 1px solid #eee;
+    padding: 3rem 0;
+    color: var(--text-light);
+    height: auto;
+
+    /* FIX: Added display flex so column and gap work */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Centers the rows horizontally */
+    justify-content: center;
+    gap: 1.5rem;
 }
-.trip-card:hover {
-    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+
+.f-info-socials i {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    transition: transform 0.3s;
+    margin: 0 0.5rem;
+    /* Add spacing between icons */
 }
-.trip-img {
-    height: 220px;
-    object-fit: cover;
+
+.f-info-socials i:hover {
+    color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+.f-info-links,
+.f-info-socials,
+.f-info-brand {
     width: 100%;
-}
-.trip-status-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* 5. Dashboard Table (Manage) */
-.dashboard-card {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    overflow: hidden;
-}
-.dashboard-header {
-    background: #222;
-    color: white;
-    padding: 1.5rem;
-    border-radius: 1rem 1rem 0 0;
-}
-.custom-table th {
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 1px;
-    padding: 1.2rem;
-    border-bottom: 2px solid #f0f0f0;
-}
-.custom-table td {
-    padding: 1.2rem;
-    vertical-align: middle;
-}
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #fe424d;
-    color: white;
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    margin-right: 0.8rem;
+}
+
+.f-info-links a {
+    text-decoration: none;
+    color: var(--text-light);
+    margin: 0 1rem;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.f-info-links a:hover {
+    color: var(--text-dark);
+    text-decoration: underline;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 6. EXTRAS                                   */
+/* -------------------------------------------------------------------------- */
+/* Flash Message Toast Styling */
+.flash-msg-container {
+    position: fixed;
+    top: 6rem;
+    right: 1.5rem;
+    z-index: 1050;
+}
+
+.flash-msg-container .alert {
+    box-shadow: var(--shadow-md);
+    border: none;
+    border-left: 5px solid;
+    background: white;
+    backdrop-filter: blur(5px);
+}
+
+.flash-msg-container .alert-success {
+    border-left-color: #198754;
+}
+
+.flash-msg-container .alert-danger {
+    border-left-color: #dc3545;
 }

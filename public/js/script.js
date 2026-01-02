@@ -23,8 +23,7 @@
 const alerts = document.querySelectorAll('.alert');
 alerts.forEach(alert => {
     setTimeout(() => {
-        // Use Bootstrap's alert instance to close it if available, or just remove DOM
         const bsAlert = new bootstrap.Alert(alert);
         bsAlert.close();
-    }, 3000); // 3 seconds
+    }, 3000); // Disappears after 3 seconds
 });
