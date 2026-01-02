@@ -18,9 +18,9 @@
     /* 2. Hero Image */
     .listing-img-container {
         width: 100%;
-        height: 400px; /* Fixed height for consistency */
+        height: 400px; 
         overflow: hidden;
-        border-radius: 1.5rem; /* Modern rounded corners */
+        border-radius: 1.5rem; 
         margin-bottom: 2rem;
         box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
@@ -31,7 +31,7 @@
         transition: transform 0.5s ease;
     }
     .listing-img-container:hover .listing-img {
-        transform: scale(1.03); /* Subtle zoom on hover */
+        transform: scale(1.03); 
     }
 
     /* 3. Host Profile Section */
@@ -65,7 +65,7 @@
         
         /* Sticky Magic */
         position: sticky;
-        top: 6rem; /* Stays 6rem from top while scrolling */
+        top: 6rem; 
         z-index: 10;
     }
     .price-tag {
@@ -131,10 +131,14 @@
             
             <div class="host-info">
                 <div class="host-avatar">
-                    <%= listing.owner.username[0].toUpperCase() %>
+                    <% if(listing.owner && listing.owner.username) { %>
+                        <%= listing.owner.username[0].toUpperCase() %>
+                    <% } else { %>
+                        ?
+                    <% } %>
                 </div>
                 <div>
-                    <h5 class="mb-0">Hosted by <%= listing.owner.username %></h5>
+                    <h5 class="mb-0">Hosted by <%= listing.owner ? listing.owner.username : 'Unknown' %></h5>
                     <small class="text-muted">Superhost &middot; 2 years hosting</small>
                 </div>
             </div>
@@ -143,7 +147,7 @@
                 <p><%= listing.description %></p>
             </div>
 
-            <% if(currUser && currUser._id.equals(listing.owner._id)){ %>
+            <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)){ %>
                 <div class="d-flex mb-4">
                     <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark me-3 px-4">Edit</a>
                     <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
@@ -152,7 +156,7 @@
                 </div>
             <% } %>
 
-            <% if(currUser && !currUser._id.equals(listing.owner._id)) { %>
+            <% if(currUser && listing.owner && !currUser._id.equals(listing.owner._id)) { %>
                 <hr class="my-4">
                 <div class="chat-section">
                     <h4>Chat with Host</h4>
@@ -217,12 +221,12 @@
                             <div class="col-md-6 mb-3">
                                 <div class="review-card h-100">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="mb-0">@<%= review.author.username %></h6>
+                                        <h6 class="mb-0">@<%= review.author ? review.author.username : 'Unknown' %></h6>
                                         <p class="starability-result mb-0" data-rating="<%= review.rating %>" style="transform: scale(0.8); transform-origin: right center;"></p>
                                     </div>
                                     <p class="card-text text-muted small"><%= review.comment %></p>
                                     
-                                    <% if(currUser && currUser._id.equals(review.author._id)) { %>
+                                    <% if(currUser && review.author && currUser._id.equals(review.author._id)) { %>
                                         <form class="mt-2" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
                                             <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none">Delete</button>
                                         </form>
@@ -257,7 +261,7 @@
                     </div>
                 </div>
 
-                <% if(currUser && !currUser._id.equals(listing.owner._id)) { %>
+                <% if(currUser && listing.owner && !currUser._id.equals(listing.owner._id)) { %>
                     <form action="/listings/<%= listing._id %>/bookings" method="POST" class="needs-validation" novalidate>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
@@ -307,7 +311,6 @@
         };
     });
 
-    // Initialize Flatpickr with cleaner styling (optional via CSS, but JS stays same)
     flatpickr("#checkin", {
         minDate: "today",
         dateFormat: "Y-m-d",
@@ -332,7 +335,8 @@
     if(toggleChatBtn) {
         const socket = io();
         const senderId = "<%= currUser ? currUser._id : '' %>";
-        const receiverId = "<%= listing.owner._id %>";
+        // Safe check for receiver ID in case listing has no owner
+        const receiverId = "<%= listing.owner ? listing.owner._id : '' %>";
         const chatBox = document.getElementById("chatBox");
         const chatMessages = document.getElementById("chatMessages");
         const msgInput = document.getElementById("msgInput");
@@ -362,7 +366,6 @@
         // Receive Message
         socket.on("receive_message", (data) => {
             const div = document.createElement("div");
-            // Style based on who sent it
             if (data.senderId === senderId) {
                 div.classList.add("text-end", "mb-2");
                 div.innerHTML = `<span class="badge bg-danger p-2">${data.message}</span>`;
@@ -371,7 +374,7 @@
                 div.innerHTML = `<span class="badge bg-secondary p-2 text-white">${data.message}</span>`;
             }
             chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight; 
         });
     }
 </script>

@@ -17,36 +17,49 @@ module.exports.signup = async (req, res, next) => {
         newUser.isVerified = false; 
 
         // 2. Register User (Do NOT login yet)
+        // We capture the registeredUser so we can delete them if email fails
         const registeredUser = await User.register(newUser, password);
 
-        // 3. Send Verification Email
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_PASS
-            }
-        });
+        // 3. Send Verification Email (Wrapped in try/catch for rollback)
+        try {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.GMAIL_USER,
+                    pass: process.env.GMAIL_PASS
+                }
+            });
 
-        const mailOptions = {
-            to: email,
-            from: 'WanderLust <no-reply@wanderlust.com>',
-            subject: 'Please Verify Your Account',
-            html: `
-                <h3>Welcome to WanderLust!</h3>
-                <p>Please verify your email to activate your account.</p>
-                <a href="http://${req.headers.host}/verify/${token}">Click here to Verify</a>
-                <br><br>
-                <p>Or paste this link: http://${req.headers.host}/verify/${token}</p>
-            `
-        };
+            const mailOptions = {
+                to: email,
+                from: 'WanderLust <no-reply@wanderlust.com>',
+                subject: 'Please Verify Your Account',
+                html: `
+                    <h3>Welcome to WanderLust!</h3>
+                    <p>Please verify your email to activate your account.</p>
+                    <a href="http://${req.headers.host}/verify/${token}">Click here to Verify</a>
+                    <br><br>
+                    <p>Or paste this link: http://${req.headers.host}/verify/${token}</p>
+                `
+            };
 
-        await transporter.sendMail(mailOptions);
+            await transporter.sendMail(mailOptions);
+
+        } catch (emailErr) {
+            // ROLLBACK: If email fails, delete the user we just created
+            await User.findByIdAndDelete(registeredUser._id);
+            
+            console.error("Email Sending Error:", emailErr);
+            req.flash("error", "Failed to send verification email. Please try registering again.");
+            return res.redirect("/signup");
+        }
 
         req.flash("success", "Registered! Please check your email to verify your account.");
         res.redirect("/login");
         
     } catch (err) {
+        // Handle registration errors (like duplicate username)
+        console.error("Signup Registration Error:", err);
         req.flash("error", err.message);
         res.redirect("/signup");
     }
@@ -204,11 +217,9 @@ module.exports.renderHostBookings = async (req, res) => {
     // --- DATA AGGREGATION FOR CHARTS ---
 
     // A. Calculate Monthly Earnings (Line Chart)
-    // Format: { "Jan 2024": 15000, "Feb 2024": 20000 }
     const earningsData = {};
     
     bookings.forEach(booking => {
-        // Create a key like "Jan 2024"
         const date = new Date(booking.checkIn);
         const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
         
@@ -219,7 +230,6 @@ module.exports.renderHostBookings = async (req, res) => {
     });
 
     // B. Calculate Bookings Per Listing (Bar/Doughnut Chart)
-    // Format: { "Villa by the Sea": 5, "Mountain Cabin": 3 }
     const listingStats = {};
     
     bookings.forEach(booking => {
@@ -282,7 +292,6 @@ module.exports.updateProfile = async (req, res) => {
         // 1. Update basic fields
         if(email) user.email = email;
         if(username && username !== user.username) {
-            // Note: Updating username is tricky with Passport, we use a utility method if available or direct update
             user.username = username;
             await user.save(); // Save to check for duplicates first
         }

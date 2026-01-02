@@ -27,7 +27,6 @@ module.exports.index = async (req, res) => {
     }
 
     // 4. Price Range Filter
-    // We strictly convert to Number() to avoid string comparison errors
     if (min_price || max_price) {
         query.price = {};
         if (min_price) query.price.$gte = Number(min_price);
@@ -41,7 +40,6 @@ module.exports.index = async (req, res) => {
 
     // 6. Amenities Filter
     if (amenities) {
-        // Ensure it's an array (if user checks only 1 box, it comes as a string)
         const amenitiesList = Array.isArray(amenities) ? amenities : [amenities];
         query.amenities = { $all: amenitiesList };
     }
@@ -49,23 +47,15 @@ module.exports.index = async (req, res) => {
     // 7. Fetch Listings
     const allListings = await Listing.find(query);
 
-    // 8. Prepare data to send back to View (to keep inputs filled)
+    // 8. Prepare data to send back to View
     let amenitiesForView = [];
     if (amenities) {
         amenitiesForView = Array.isArray(amenities) ? amenities : [amenities];
     }
 
-    // 9. Render View with BOTH 'allListings' AND 'values'
     res.render("listings/index.ejs", { 
         allListings, 
-        values: { 
-            search, 
-            category, 
-            min_price, 
-            max_price, 
-            guests, 
-            amenities: amenitiesForView 
-        } 
+        values: { search, category, min_price, max_price, guests, amenities: amenitiesForView } 
     });
 }
 
@@ -82,7 +72,7 @@ module.exports.show = async (req, res) => {
 
     if (!listing) {
         req.flash("error", "Listing does not exist!");
-        res.redirect("/listings");
+        return res.redirect("/listings"); 
     }
 
     const bookings = await Booking.find({ listing: id });
@@ -113,9 +103,10 @@ module.exports.edit = async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
 
+    // FIX: Add 'return' here as well
     if (!listing) {
         req.flash("error", "Listing does not exist!");
-        res.redirect("/listings");
+        return res.redirect("/listings");
     }
 
     let originalImageUrl = listing.image.url;
