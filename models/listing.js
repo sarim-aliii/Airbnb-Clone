@@ -37,10 +37,21 @@ const listingSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ["mountain", "arctic", "farms", "beach", "farms"],
+        enum: [
+            "trending", 
+            "rooms", 
+            "iconic-cities", 
+            "mountains", 
+            "castles", 
+            "amazing-pools", 
+            "camping", 
+            "farms", 
+            "arctic", 
+            "domes", 
+            "boats"
+        ],
     }
 });
-
 
 // To delete the reviews if we delete the listing
 listingSchema.post("findOneAndDelete", async(listing) => {

@@ -1,4 +1,6 @@
 const User = require("../models/user.js");
+const Booking = require("../models/booking");
+const Listing = require("../models/listing");
 
 
 module.exports.signup = async (req, res) => {
@@ -26,9 +28,6 @@ module.exports.signup = async (req, res) => {
 module.exports.login = async (req, res) => {
     req.flash("success", "Welcome to WanderLust!!!");
 
-    // dont work as soon as user logged in express will clear out session information
-    // res.redirect(req.session.redirectUrl);   
-
     if (res.locals.redirectUrl) {
         res.redirect(res.locals.redirectUrl);
     }
@@ -47,3 +46,23 @@ module.exports.logout = (req, res, next) => {
         res.redirect("/listings");
     }); 
 }
+
+// New Method for Dashboard
+module.exports.renderTrips = async (req, res) => {
+    const bookings = await Booking.find({ author: req.user._id }).populate("listing");
+    res.render("users/trips.ejs", { bookings });
+}
+
+
+module.exports.renderHostBookings = async (req, res) => {
+    // 1. Find all listings owned by the current user
+    const listings = await Listing.find({ owner: req.user._id });
+    
+    // 2. Find all bookings that are for ANY of those listings
+    const bookings = await Booking.find({ listing: { $in: listings } })
+        .populate("listing")
+        .populate("author") // Populate guest details
+        .sort({ createdAt: -1 }); // Show newest bookings first
+
+    res.render("users/manage.ejs", { bookings });
+};

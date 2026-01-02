@@ -22,7 +22,7 @@
 
 <nav class="navbar navbar-expand-md bg-body-light bottom-border sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-brands fa-airbnb"></i></a>
+    <a class="navbar-brand" href="/"><i class="fa-brands fa-airbnb"></i></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -33,8 +33,8 @@
       </div>
 
       <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
-          <input class="form-control me-2 search-input" type="search" placeholder="Search destinations">
+        <form class="d-flex" role="search" action="/listings" method="GET">
+          <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search destinations">
           <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
         </form>
       </div>
@@ -45,7 +45,10 @@
           <a class="nav-link" href="/signup"><b>Signup</b></a>
           <a class="nav-link" href="/login"><b>Login</b></a>
         <% } %>  
+      
         <% if(currUser){ %>
+          <a class="nav-link" href="/manage"><b>Manage Bookings</b></a>
+          <a class="nav-link" href="/trips"><b>My Trips</b></a>
           <a class="nav-link" href="/logout"><b>Logout</b></a>
         <% } %>  
       </div>

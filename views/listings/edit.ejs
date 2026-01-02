@@ -53,6 +53,21 @@
                         Location should be valid
                     </div>
                 </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select name="listing[category]" class="form-select" required>
+                        <% const categories = ["trending", "rooms", "iconic-cities", "mountains", "castles", "amazing-pools", "camping", "farms", "arctic", "domes", "boats"]; %>
+                        <% for(let cat of categories) { %>
+                            <option value="<%= cat %>" <%= listing.category === cat ? 'selected' : '' %> >
+                                <%= cat.charAt(0).toUpperCase() + cat.slice(1).replace("-", " ") %>
+                            </option>
+                        <% } %>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select a category
+                    </div>
+                </div>
                 
                 <button class="btn btn-dark edit-btn mt-3">Edit</button>
             </form>

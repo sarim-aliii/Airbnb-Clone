@@ -24,6 +24,7 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const bookingRouter = require("./routes/booking.js");
 
 
 const dbUrl = process.env.ATLASDB_URL;
@@ -90,11 +91,13 @@ app.use((req, res, next) => {
 
 
 app.get("/", (req, res) => {
-    res.redirect("/listings");
+    res.render("home.ejs");
 });
+
 
 app.use("/listings", listingRouter); // Restructuring listings
 app.use("/listings/:id/reviews", reviewRouter); // Restructuring reviews
+app.use("/listings/:id/bookings", bookingRouter);
 app.use("/", userRouter);
 
 
@@ -109,7 +112,6 @@ app.all("*", (req, res, next) => {
 app.use((err, req, res, next) => {
     let {status=500, message="Something went wrong!"} = err;
     res.status(status).render("error.ejs", {message})
-    // res.status(status).send(message);
 });
 
 

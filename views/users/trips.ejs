@@ -1,0 +1,55 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="container mt-4 mb-5">
+    <h3 class="mb-4 fw-bold">My Trips ✈️</h3>
+    
+    <% if(bookings.length === 0) { %>
+        <div class="alert alert-light shadow-sm text-center p-5" role="alert">
+            <i class="fa-solid fa-suitcase-rolling fa-3x mb-3 text-muted"></i>
+            <h5>No trips booked yet</h5>
+            <p class="text-muted">Time to dust off your bags and start planning!</p>
+            <a href="/listings" class="btn btn-outline-danger mt-3 rounded-pill px-4">Find a place</a>
+        </div>
+    <% } else { %>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <% for(let booking of bookings) { %>
+                <div class="col">
+                    <div class="card trip-card h-100">
+                        <div class="position-relative">
+                            <img src="<%= booking.listing.image.url %>" class="trip-img" alt="listing">
+                            <span class="badge bg-success trip-status-badge">Confirmed</span>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-truncate"><%= booking.listing.title %></h5>
+                            <p class="card-text text-muted small">
+                                <i class="fa-solid fa-location-dot me-1"></i> <%= booking.listing.location %>
+                            </p>
+                            
+                            <div class="d-flex justify-content-between bg-light rounded p-3 mt-3">
+                                <div class="text-center">
+                                    <small class="text-muted d-block">Check-in</small>
+                                    <span class="fw-bold"><%= booking.checkIn.toLocaleDateString('en-US', {month:'short', day:'numeric'}) %></span>
+                                </div>
+                                <div class="border-start"></div>
+                                <div class="text-center">
+                                    <small class="text-muted d-block">Check-out</small>
+                                    <span class="fw-bold"><%= booking.checkOut.toLocaleDateString('en-US', {month:'short', day:'numeric'}) %></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <small class="text-muted">Total Price</small>
+                                <div class="fw-bold text-dark fs-5">₹<%= booking.totalPrice.toLocaleString("en-IN") %></div>
+                            </div>
+                            <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
