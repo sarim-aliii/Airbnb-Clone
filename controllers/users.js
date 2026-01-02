@@ -53,18 +53,6 @@ module.exports.signup = async (req, res, next) => {
 };
 
 
-module.exports.login = async (req, res) => {
-    req.flash("success", "Welcome to WanderLust!!!");
-
-    if (res.locals.redirectUrl) {
-        res.redirect(res.locals.redirectUrl);
-    }
-    else {
-        res.redirect("/listings");
-    }
-}
-
-
 module.exports.logout = (req, res, next) => {
     req.logout((err) => {
         if(err){

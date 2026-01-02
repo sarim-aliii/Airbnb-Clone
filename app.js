@@ -22,7 +22,11 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
-
+const http = require('http');
+const { Server } = require("socket.io");
+const Chat = require("./models/chat.js"); 
+const server = http.createServer(app);
+const io = new Server(server);
 
 // Express Router
 const listingRouter = require("./routes/listing.js");
@@ -150,7 +154,31 @@ app.use((err, req, res, next) => {
     res.status(status).render("error.ejs", { message })
 });
 
+io.on("connection", (socket) => {
+    console.log("A user connected");
 
-app.listen(port, (req, res) => {
+    // Join a unique room for the pair of users (Guest + Host)
+    socket.on("join_room", async ({ senderId, receiverId }) => {
+        // Create a unique room ID by sorting user IDs (ensures UserA+UserB is same as UserB+UserA)
+        const room = [senderId, receiverId].sort().join("_");
+        socket.join(room);
+    });
+
+    // Handle sending messages
+    socket.on("send_message", async (data) => {
+        const { senderId, receiverId, message } = data;
+        const room = [senderId, receiverId].sort().join("_");
+
+        // Save message to Database
+        const newChat = new Chat({ sender: senderId, receiver: receiverId, message });
+        await newChat.save();
+
+        // Emit message to people in that room
+        io.to(room).emit("receive_message", data);
+    });
+});
+
+
+server.listen(port, (req, res) => {
     console.log(`Server is running on port ${port}`);
 });

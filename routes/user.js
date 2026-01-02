@@ -21,6 +21,11 @@ router.route("/signup")
 router.get("/verify/:token", wrapAsync(userController.verifyEmail));
 
 
+router.get("/login", (req, res) => {
+    res.render("users/login.ejs");
+});
+
+
 // Log in
 router.post("/login", saveRedirectUrl, async (req, res, next) => {
     passport.authenticate("local", async (err, user, info) => {
