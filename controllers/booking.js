@@ -92,3 +92,23 @@ module.exports.createBooking = async (req, res) => {
     req.flash("success", `Booking confirmed! Total: ₹${totalPrice.toLocaleString("en-IN")}`);
     res.redirect(`/listings/${id}`);
 };
+
+
+module.exports.cancelBooking = async (req, res) => {
+    let { id, bookingId } = req.params;
+    
+    // 1. Find the booking
+    const booking = await Booking.findById(bookingId);
+
+    // 2. Check if user is authorized (matches author)
+    if (!booking.author.equals(req.user._id)) {
+        req.flash("error", "You do not have permission to cancel this booking.");
+        return res.redirect("/trips");
+    }
+
+    // 3. Update status to 'cancelled'
+    await Booking.findByIdAndUpdate(bookingId, { status: "cancelled" });
+
+    req.flash("success", "Booking cancelled successfully.");
+    res.redirect("/trips");
+};

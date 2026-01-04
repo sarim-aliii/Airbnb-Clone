@@ -15,7 +15,7 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <% for(let booking of bookings) { %>
                 <div class="col">
-                    <div class="card trip-card h-100">
+                    <div class="card trip-card h-100 <%= booking.status === 'cancelled' ? 'opacity-75' : '' %>">
                         <div class="position-relative">
                             <img 
                                 src="<%= booking.listing.image.url.replace('/upload/', '/upload/w_800,f_auto,q_auto/') %>" 
@@ -23,7 +23,11 @@
                                 alt="listing"
                                 loading="lazy"
                             >
-                            <span class="badge bg-success trip-status-badge">Confirmed</span>
+                            <% if(booking.status === 'booked') { %>
+                                <span class="badge bg-success trip-status-badge">Confirmed</span>
+                            <% } else if(booking.status === 'cancelled') { %>
+                                <span class="badge bg-danger trip-status-badge">Cancelled</span>
+                            <% } %>
                         </div>
                         
                         <div class="card-body">
@@ -48,9 +52,24 @@
                         <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center mb-2">
                             <div>
                                 <small class="text-muted">Total Price</small>
-                                <div class="fw-bold text-dark fs-5">₹<%= booking.totalPrice.toLocaleString("en-IN") %></div>
+                                <div class="fw-bold text-dark fs-5">
+                                    <% if(booking.status === 'cancelled') { %>
+                                        <span class="text-decoration-line-through text-muted">₹<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+                                    <% } else { %>
+                                        ₹<%= booking.totalPrice.toLocaleString("en-IN") %>
+                                    <% } %>
+                                </div>
                             </div>
-                            <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+
+                            <div class="d-flex align-items-center">
+                                <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-dark rounded-pill px-3 me-2">View</a>
+                                
+                                <% if(booking.status === 'booked' && new Date(booking.checkIn) > new Date()) { %>
+                                    <form method="POST" action="/listings/<%= booking.listing._id %>/bookings/<%= booking._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to cancel this trip?');">
+                                        <button class="btn btn-sm btn-danger rounded-pill px-3">Cancel</button>
+                                    </form>
+                                <% } %>
+                             </div>
                         </div>
                     </div>
                 </div>

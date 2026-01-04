@@ -112,6 +112,6 @@ router.put("/profile",
 router.get("/inbox", isLoggedIn, chatController.renderInbox);
 router.get("/inbox/:userId", isLoggedIn, chatController.renderChat);
 router.get("/manage/calendar", isLoggedIn, userController.renderCalendar);
-router.post("/block", isLoggedIn, wrapAsync(bookingController.createBlock));
+
 
 module.exports = router;
