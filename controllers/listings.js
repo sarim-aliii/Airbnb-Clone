@@ -7,11 +7,9 @@ const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index = async (req, res) => {
-    // 1. Destructure all filter parameters from the URL
-    let { search, category, min_price, max_price, guests, amenities } = req.query;
+    let { search, category, min_price, max_price, guests, amenities, checkIn, checkOut } = req.query;
     let query = {};
 
-    // 2. Search Filter (Title, Location, Country)
     if (search) {
         const regex = new RegExp(search, 'i');
         query.$or = [
@@ -21,33 +19,43 @@ module.exports.index = async (req, res) => {
         ];
     }
 
-    // 3. Category Filter
     if (category && category !== "undefined") {
         query.category = category;
     }
 
-    // 4. Price Range Filter
     if (min_price || max_price) {
         query.price = {};
         if (min_price) query.price.$gte = Number(min_price);
         if (max_price) query.price.$lte = Number(max_price);
     }
 
-    // 5. Guest Capacity Filter
     if (guests) {
         query.guestCapacity = { $gte: Number(guests) };
     }
 
-    // 6. Amenities Filter
     if (amenities) {
         const amenitiesList = Array.isArray(amenities) ? amenities : [amenities];
         query.amenities = { $all: amenitiesList };
     }
 
-    // 7. Fetch Listings
+    if (checkIn && checkOut) {
+        const startDate = new Date(checkIn);
+        const endDate = new Date(checkOut);
+
+        const overlappingBookings = await Booking.find({
+            checkIn: { $lt: endDate },
+            checkOut: { $gt: startDate }
+        }).select("listing");
+
+        const unavailableListingIds = overlappingBookings.map(b => b.listing);
+
+        if (unavailableListingIds.length > 0) {
+            query._id = { $nin: unavailableListingIds };
+        }
+    }
+
     const allListings = await Listing.find(query);
 
-    // 8. Prepare data to send back to View
     let amenitiesForView = [];
     if (amenities) {
         amenitiesForView = Array.isArray(amenities) ? amenities : [amenities];
@@ -55,7 +63,7 @@ module.exports.index = async (req, res) => {
 
     res.render("listings/index.ejs", { 
         allListings, 
-        values: { search, category, min_price, max_price, guests, amenities: amenitiesForView } 
+        values: { search, category, min_price, max_price, guests, amenities: amenitiesForView, checkIn, checkOut } 
     });
 }
 

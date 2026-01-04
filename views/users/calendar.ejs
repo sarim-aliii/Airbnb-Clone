@@ -1,0 +1,107 @@
+<% layout("layouts/boilerplate") %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3>Manage Availability 📅</h3>
+            <p class="text-muted">Select a property to manage its calendar.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form action="/manage/calendar" method="GET">
+                <select name="listingId" class="form-select form-select-lg" onchange="this.form.submit()">
+                    <% for(let list of listings) { %>
+                        <option value="<%= list._id %>" <%= list._id.equals(selectedListingId) ? 'selected' : '' %>>
+                            <%= list.title %>
+                        </option>
+                    <% } %>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <% if(selectedListingId) { %>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm p-3">
+                    <h5 class="card-title mb-3">Block Dates</h5>
+                    <form action="/listings/<%= selectedListingId %>/bookings/block" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Select Range</label>
+                            <input type="text" id="datePicker" class="form-control" placeholder="Select dates..." required>
+                            <input type="hidden" name="checkIn" id="checkIn">
+                            <input type="hidden" name="checkOut" id="checkOut">
+                        </div>
+                        <button class="btn btn-dark w-100" style="background-color: #222;">Block Dates</button>
+                    </form>
+                    <hr>
+                    <div class="small text-muted">
+                        <i class="fa-solid fa-square text-danger"></i> Booked by Guest<br>
+                        <i class="fa-solid fa-square text-secondary"></i> Blocked by You
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm p-3 d-flex justify-content-center">
+                    <div id="inline-calendar"></div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    const bookings = <%- JSON.stringify(bookings || []) %>;
+
+    // Separate booked dates vs blocked dates for color coding (optional custom logic)
+    // For now, we simply disable them all.
+    const disabledDates = bookings.map(b => ({
+        from: b.checkIn,
+        to: b.checkOut
+    }));
+
+    // Initialize Flatpickr
+    flatpickr("#datePicker", {
+        mode: "range",
+        minDate: "today",
+        dateFormat: "Y-m-d",
+        disable: disabledDates,
+        inline: true, // Show calendar always
+        appendTo: document.getElementById('inline-calendar'), // Attach to the visual div
+        onChange: function(selectedDates, dateStr, instance) {
+            // If range selected, populate hidden inputs
+            if (selectedDates.length === 2) {
+                // Update the hidden inputs for the form
+                document.getElementById('checkIn').value = instance.formatDate(selectedDates[0], "Y-m-d");
+                document.getElementById('checkOut').value = instance.formatDate(selectedDates[1], "Y-m-d");
+                
+                // Also update the visible input just in case
+                document.getElementById('datePicker').value = dateStr;
+            }
+        },
+        onDayCreate: function(dObj, dStr, fp, dayElem){
+            // Custom Styling for existing bookings
+            // Loop through bookings to find if this day matches
+            const date = dayElem.dateObj;
+            bookings.forEach(b => {
+                const start = new Date(b.checkIn);
+                const end = new Date(b.checkOut);
+                if (date >= start && date <= end) {
+                    if(b.status === 'blocked') {
+                        dayElem.style.backgroundColor = "#6c757d"; // Grey for blocked
+                        dayElem.style.borderColor = "#6c757d";
+                    } else {
+                        dayElem.style.backgroundColor = "#fe424d"; // Red for booked
+                        dayElem.style.borderColor = "#fe424d";
+                    }
+                    dayElem.style.color = "white";
+                }
+            });
+        }
+    });
+</script>

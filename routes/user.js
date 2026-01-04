@@ -4,6 +4,8 @@ const wrapAsync = require("../utils/wrapAsync");
 const passport = require("passport");
 const { saveRedirectUrl, isLoggedIn } = require("../middleware.js");
 const userController = require("../controllers/users.js");
+const chatController = require("../controllers/chat.js");
+
 
 
 // Image Upload Setup
@@ -107,5 +109,9 @@ router.put("/profile",
   wrapAsync(userController.updateProfile)
 );
 
+router.get("/inbox", isLoggedIn, chatController.renderInbox);
+router.get("/inbox/:userId", isLoggedIn, chatController.renderChat);
+router.get("/manage/calendar", isLoggedIn, userController.renderCalendar);
+router.post("/block", isLoggedIn, wrapAsync(bookingController.createBlock));
 
 module.exports = router;

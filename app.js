@@ -28,6 +28,10 @@ const Chat = require("./models/chat.js");
 const server = http.createServer(app);
 const io = new Server(server);
 
+const Notification = require("./models/notification.js");
+const nodemailer = require('nodemailer');
+
+
 // Express Router
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
@@ -86,15 +90,30 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 
+app.use(async (req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;
+
+    if (req.user) {
+        const Notification = require("./models/notification"); 
+        const unreadCount = await Notification.countDocuments({ user: req.user._id, isRead: false });
+        res.locals.unreadCount = unreadCount;
+    } else {
+        res.locals.unreadCount = 0;
+    }
+    
+    next();
+});
+
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/auth/google/callback" // Adjust port if needed
+    callbackURL: "http://localhost:8080/auth/google/callback"
 },
     async (accessToken, refreshToken, profile, done) => {
         try {
-            // Check if user already exists
             let user = await User.findOne({ googleId: profile.id });
 
             if (user) {
@@ -108,7 +127,6 @@ passport.use(new GoogleStrategy({
                     isVerified: true // Trust Google users immediately
                 });
 
-                // We save directly since they don't need a password
                 await newUser.save();
                 return done(null, newUser);
             }
@@ -154,12 +172,34 @@ app.use((err, req, res, next) => {
     res.status(status).render("error.ejs", { message })
 });
 
+const sendEmailNotification = async (receiverEmail, senderName, message) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_PASS
+        }
+    });
+
+    const mailOptions = {
+        to: receiverEmail,
+        subject: `New Message from ${senderName}`,
+        html: `<p>You have a new message from <b>${senderName}</b>:</p>
+               <p>"${message}"</p>
+               <a href="${process.env.BASE_URL || 'http://localhost:8080'}/inbox">Reply Now</a>`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (err) {
+        console.error("Email notification failed:", err);
+    }
+};
+
 io.on("connection", (socket) => {
     console.log("A user connected");
 
-    // Join a unique room for the pair of users (Guest + Host)
     socket.on("join_room", async ({ senderId, receiverId }) => {
-        // Create a unique room ID by sorting user IDs (ensures UserA+UserB is same as UserB+UserA)
         const room = [senderId, receiverId].sort().join("_");
         socket.join(room);
     });
@@ -169,13 +209,43 @@ io.on("connection", (socket) => {
         const { senderId, receiverId, message } = data;
         const room = [senderId, receiverId].sort().join("_");
 
-        // Save message to Database
+        // 1. Save Message
         const newChat = new Chat({ sender: senderId, receiver: receiverId, message });
         await newChat.save();
 
-        // Emit message to people in that room
+        // 2. Create In-App Notification
+        const newNotif = new Notification({
+            user: receiverId,
+            type: 'message',
+            message: `New message: ${message.substring(0, 20)}...`,
+            relatedId: newChat._id
+        });
+        await newNotif.save();
+
+        // 3. Emit to Room
         io.to(room).emit("receive_message", data);
+
+        // 4. Send Email Notification (Async)
+        // Fetch sender and receiver details to get email/username
+        const User = require("./models/user"); 
+        const receiver = await User.findById(receiverId);
+        const sender = await User.findById(senderId);
+        
+        if(receiver && sender) {
+            sendEmailNotification(receiver.email, sender.username, message);
+        }
     });
+});
+
+app.use(async (req, res, next) => {
+    if (req.user) {
+        const Notification = require("./models/notification");
+        const unreadCount = await Notification.countDocuments({ user: req.user._id, isRead: false });
+        res.locals.unreadCount = unreadCount;
+    } else {
+        res.locals.unreadCount = 0;
+    }
+    next();
 });
 
 

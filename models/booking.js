@@ -22,7 +22,12 @@ const bookingSchema = new Schema({
     },
     totalPrice: {
         type: Number,
-        required: true,
+        default: 0,
+    },
+    status: {
+        type: String,
+        enum: ['booked', 'blocked'],
+        default: 'booked'
     },
     createdAt: {
         type: Date,

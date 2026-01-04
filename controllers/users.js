@@ -312,3 +312,23 @@ module.exports.updateProfile = async (req, res) => {
         res.redirect("/profile");
     }
 };
+
+
+module.exports.renderCalendar = async (req, res) => {
+    // 1. Fetch all listings owned by the user
+    const listings = await Listing.find({ owner: req.user._id });
+    
+    // 2. Determine which listing is selected (default to first one)
+    const selectedListingId = req.query.listingId || (listings.length > 0 ? listings[0]._id : null);
+    
+    let bookings = [];
+    let selectedListing = null;
+
+    if (selectedListingId) {
+        selectedListing = await Listing.findById(selectedListingId);
+        // Fetch both bookings and blocks
+        bookings = await Booking.find({ listing: selectedListingId });
+    }
+
+    res.render("users/calendar.ejs", { listings, selectedListingId, selectedListing, bookings });
+};

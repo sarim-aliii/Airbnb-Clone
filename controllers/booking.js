@@ -1,6 +1,48 @@
 const Booking = require("../models/booking");
 const Listing = require("../models/listing");
 
+
+module.exports.createBlock = async (req, res) => {
+    let { id } = req.params; // listingId
+    const { checkIn, checkOut } = req.body;
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+
+    if (start >= end) {
+        req.flash("error", "End date must be after start date!");
+        return res.redirect(`/manage/calendar?listingId=${id}`);
+    }
+
+    // Check for Overlaps (Same logic as booking)
+    const existingBooking = await Booking.findOne({
+        listing: id,
+        $or: [
+            { checkIn: { $lt: end }, checkOut: { $gt: start } }
+        ]
+    });
+
+    if (existingBooking) {
+        req.flash("error", "These dates are already booked or blocked!");
+        return res.redirect(`/manage/calendar?listingId=${id}`);
+    }
+
+    // Save as Blocked
+    const newBlock = new Booking({
+        listing: id,
+        author: req.user._id,
+        checkIn: start,
+        checkOut: end,
+        totalPrice: 0,
+        status: 'blocked'
+    });
+
+    await newBlock.save();
+    req.flash("success", "Dates blocked successfully.");
+    res.redirect(`/manage/calendar?listingId=${id}`);
+};
+
+
 module.exports.createBooking = async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
@@ -19,8 +61,6 @@ module.exports.createBooking = async (req, res) => {
         return res.redirect(`/listings/${id}`);
     }
 
-    // 3. CHECK FOR OVERLAPPING BOOKINGS
-    // Logic: A new booking overlaps if (NewStart < ExistingEnd) AND (NewEnd > ExistingStart)
     const existingBooking = await Booking.findOne({
         listing: id,
         $or: [

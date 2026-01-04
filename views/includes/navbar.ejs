@@ -23,7 +23,7 @@
   }
 </style>
 
-<nav class="navbar navbar-expand-md bg-body-light bottom-border sticky-top">
+<nav class="navbar navbar-expand-md bg-body-tertiary bottom-border sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="/"><i class="fa-brands fa-airbnb"></i></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
@@ -45,10 +45,45 @@
       <div class="navbar-nav ms-auto">
         <a class="nav-link" href="/listings/new">Airbnb your home</a>
 
+        <div class="nav-item dropdown me-2">
+            <button class="btn nav-link" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme">
+                <i class="fa-solid fa-circle-half-stroke" style="font-size: 1.2rem;"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme">
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
+                        <i class="fa-regular fa-sun me-2 opacity-50"></i> Light
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+                        <i class="fa-solid fa-moon me-2 opacity-50"></i> Dark
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto">
+                        <i class="fa-solid fa-circle-half-stroke me-2 opacity-50"></i> Auto
+                    </button>
+                </li>
+            </ul>
+        </div>
         <% if(!currUser){ %>
           <a class="nav-link" href="/signup"><b>Signup</b></a>
           <a class="nav-link" href="/login"><b>Login</b></a>
           <% } else { %>
+
+            <div class="nav-item me-3">
+              <a href="/inbox" class="nav-link position-relative">
+                <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
+                <% if(locals.unreadCount && unreadCount > 0) { %>
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <%= unreadCount %>
+                    <span class="visually-hidden">unread messages</span>
+                  </span>
+                <% } %>
+              </a>
+            </div>
+
             <div class="nav-item dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -63,6 +98,7 @@
                 <li><a class="dropdown-item" href="/manage">Host Dashboard</a></li>
                 <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
                 <li><a class="dropdown-item" href="/trips">My Trips</a></li>
+                <li><a class="dropdown-item" href="/inbox">Inbox</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
