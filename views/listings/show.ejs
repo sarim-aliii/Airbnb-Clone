@@ -189,7 +189,7 @@
                 <% if(currUser){%>
                     <div class="card bg-light border-0 p-3 mb-4 mt-3" style="border-radius: 1rem;">
                         <h6 class="mb-3">Leave a review</h6>
-                        <form method="POST" action="/listings/<%= listing._id %>/reviews" novalidate class="needs-validation">
+                        <form method="POST" action="/listings/<%= listing._id %>/reviews" novalidate class="needs-validation" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <fieldset class="starability-slot">
                                     <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
@@ -210,6 +210,10 @@
                                 <textarea name="review[comment]" id="comment" rows="3" class="form-control" required style="border-radius: 1rem;"></textarea>
                                 <div class="invalid-feedback">Please add some comments for review</div>
                             </div>
+                            <div class="mb-3">
+                                <label for="reviewImage" class="form-label">Attach a Photo (optional)</label>
+                                <input type="file" name="review[image]" id="reviewImage" class="form-control" accept="image/*">
+                            </div>
                             <button class="btn btn-outline-dark rounded-pill">Submit Review</button>
                         </form>
                     </div>
@@ -226,6 +230,12 @@
                                     </div>
                                     <p class="card-text text-muted small"><%= review.comment %></p>
                                     
+                                    <% if(review.image && review.image.url) { %>
+                                        <div class="mb-2 mt-2">
+                                            <img src="<%= review.image.url %>" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;" alt="Review Image">
+                                        </div>
+                                    <% } %>
+
                                     <% if(currUser && review.author && currUser._id.equals(review.author._id)) { %>
                                         <form class="mt-2" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
                                             <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none">Delete</button>

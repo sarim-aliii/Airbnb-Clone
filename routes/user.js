@@ -114,4 +114,10 @@ router.get("/inbox/:userId", isLoggedIn, chatController.renderChat);
 router.get("/manage/calendar", isLoggedIn, userController.renderCalendar);
 
 
+router.get("/admin/promote", 
+    isLoggedIn, 
+    wrapAsync(userController.makeAdmin)
+);
+
+
 module.exports = router;

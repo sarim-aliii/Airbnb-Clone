@@ -14,7 +14,11 @@ const reviewSchema = new mongoose.Schema({
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-    }
+    },
+    image: {
+        url: String,
+        filename: String
+    },
 });
 
 const Review = mongoose.model("Review", reviewSchema);

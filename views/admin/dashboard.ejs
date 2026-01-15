@@ -1,0 +1,96 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="container mt-4 mb-5">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <p class="card-text display-6"><%= totalUsers %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Revenue</h5>
+                    <p class="card-text display-6">&#8377; <%= totalRevenue.toLocaleString("en-IN") %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Listings</h5>
+                    <p class="card-text display-6"><%= totalListings %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Bookings</h5>
+                    <p class="card-text display-6"><%= totalBookings %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Recent Users</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Username/Email</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let user of recentUsers) { %>
+                        <tr>
+                            <td><%= user.username || user.email %></td>
+                            <td><span class="badge bg-secondary"><%= user.role %></span></td>
+                            <td>
+                                <% if(user.role !== 'admin') { %>
+                                <form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST" class="d-inline">
+                                    <button class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Manage Listings</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Owner</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let listing of recentListings) { %>
+                        <tr>
+                            <td><%= listing.title %></td>
+                            <td><%= listing.owner ? listing.owner.username : 'Unknown' %></td>
+                            <td>
+                                <form action="/admin/listings/<%= listing._id %>?_method=DELETE" method="POST" class="d-inline">
+                                    <button class="btn btn-sm btn-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

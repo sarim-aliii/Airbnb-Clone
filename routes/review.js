@@ -5,8 +5,18 @@ const { validateReview, isLoggedIn, isAuthor } = require("../middleware.js");
 const reviewController = require("../controllers/reviews.js")
 
 
+const multer = require('multer');
+const { storage } = require('../cloudConfig.js');
+const upload = multer({ storage });
+
+
 // Post Route
-router.post("/", validateReview, isLoggedIn, wrapAsync(reviewController.post));
+router.post("/", 
+    isLoggedIn, 
+    upload.single('review[image]'),
+    validateReview, 
+    wrapAsync(reviewController.post)
+);
 
 
 // Delete review

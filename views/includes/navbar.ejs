@@ -35,15 +35,14 @@
         <a class="nav-link" href="/listings">Explore</a>
       </div>
 
-      <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search" action="/listings" method="GET">
+      <div class="navbar-nav ms-auto align-items-center">
+        
+        <form class="d-flex me-3" role="search" action="/listings" method="GET">
           <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search destinations">
           <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
         </form>
-      </div>
 
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Airbnb your home</a>
+        <a class="nav-link me-2" href="/listings/new">Airbnb your home</a>
 
         <div class="nav-item dropdown me-2">
             <button class="btn nav-link" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme">
@@ -67,45 +66,46 @@
                 </li>
             </ul>
         </div>
+
         <% if(!currUser){ %>
           <a class="nav-link" href="/signup"><b>Signup</b></a>
           <a class="nav-link" href="/login"><b>Login</b></a>
-          <% } else { %>
+        <% } else { %>
 
-            <div class="nav-item me-3">
-              <a href="/inbox" class="nav-link position-relative">
-                <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
-                <% if(locals.unreadCount && unreadCount > 0) { %>
-                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    <%= unreadCount %>
-                    <span class="visually-hidden">unread messages</span>
-                  </span>
-                <% } %>
-              </a>
-            </div>
+          <div class="nav-item me-3">
+            <a href="/inbox" class="nav-link position-relative">
+              <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
+              <% if(locals.unreadCount && unreadCount > 0) { %>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <%= unreadCount %>
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              <% } %>
+            </a>
+          </div>
 
-            <div class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                <% if(currUser.image && currUser.image.url) { %>
-                  <img src="<%= currUser.image.url %>" class="rounded-circle me-2"
-                    style="width: 25px; height: 25px; object-fit: cover;">
-                  <% } %>
-                    <b>Account</b>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="/profile">My Profile</a></li>
-                <li><a class="dropdown-item" href="/manage">Host Dashboard</a></li>
-                <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
-                <li><a class="dropdown-item" href="/trips">My Trips</a></li>
-                <li><a class="dropdown-item" href="/inbox">Inbox</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="/logout">Logout</a></li>
-              </ul>
-            </div>
-            <% } %>
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <% if(currUser.image && currUser.image.url) { %>
+                <img src="<%= currUser.image.url %>" class="rounded-circle me-2"
+                  style="width: 25px; height: 25px; object-fit: cover;">
+              <% } %>
+                <b>Account</b>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/profile">My Profile</a></li>
+              <li><a class="dropdown-item" href="/manage">Host Dashboard</a></li>
+              <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
+              <li><a class="dropdown-item" href="/trips">My Trips</a></li>
+              <li><a class="dropdown-item" href="/inbox">Inbox</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+          </div>
+        <% } %>
       </div>
 
     </div>

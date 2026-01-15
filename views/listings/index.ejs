@@ -244,6 +244,48 @@
                         <% } %>
     </div>
 
+    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+    <div class="d-flex justify-content-center mt-4 mb-5">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <% 
+                    let params = new URLSearchParams();
+                    if(values.search) params.append('search', values.search);
+                    if(values.category && values.category !== "undefined") params.append('category', values.category);
+                    if(values.min_price) params.append('min_price', values.min_price);
+                    if(values.max_price) params.append('max_price', values.max_price);
+                    if(values.guests) params.append('guests', values.guests);
+                    if(values.checkIn) params.append('checkIn', values.checkIn);
+                    if(values.checkOut) params.append('checkOut', values.checkOut);
+                    
+                    if(values.amenities && values.amenities.length > 0) {
+                        values.amenities.forEach(a => params.append('amenities', a));
+                    }
+                    
+                    let queryString = params.toString();
+                    let prefix = queryString ? `&${queryString}` : '';
+                %>
+
+                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link" href="/listings?page=<%= currentPage - 1 %><%= prefix %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Previous</span>
+                    </a>
+                </li>
+
+                <li class="page-item disabled">
+                    <span class="page-link text-muted">Page <%= currentPage %> of <%= totalPages %></span>
+                </li>
+
+                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                    <a class="page-link" href="/listings?page=<%= currentPage + 1 %><%= prefix %>" aria-label="Next">
+                        <span aria-hidden="true">Next &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <% } %>
+
     <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -260,40 +302,40 @@
                                     <input type="hidden" name="category" value="<%= values.category %>">
                                     <% } %>
 
-                                        <h6>Price Range</h6>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <input type="number" name="min_price" class="form-control me-2"
-                                                placeholder="Min" min="0"
-                                                value="<%= (values && values.min_price) ? values.min_price : '' %>">
-                                            <span>-</span>
-                                            <input type="number" name="max_price" class="form-control ms-2"
-                                                placeholder="Max" min="0"
-                                                value="<%= (values && values.max_price) ? values.max_price : '' %>">
-                                        </div>
+                                    <h6>Price Range</h6>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <input type="number" name="min_price" class="form-control me-2"
+                                            placeholder="Min" min="0"
+                                            value="<%= (values && values.min_price) ? values.min_price : '' %>">
+                                        <span>-</span>
+                                        <input type="number" name="max_price" class="form-control ms-2"
+                                            placeholder="Max" min="0"
+                                            value="<%= (values && values.max_price) ? values.max_price : '' %>">
+                                    </div>
 
-                                        <h6>Guest Capacity</h6>
-                                        <div class="mb-3">
-                                            <input type="number" name="guests" class="form-control" placeholder="Any"
-                                                min="1" value="<%= (values && values.guests) ? values.guests : '' %>">
-                                        </div>
+                                    <h6>Guest Capacity</h6>
+                                    <div class="mb-3">
+                                        <input type="number" name="guests" class="form-control" placeholder="Any"
+                                            min="1" value="<%= (values && values.guests) ? values.guests : '' %>">
+                                    </div>
 
-                                        <h6>Amenities</h6>
-                                        <div class="row">
-                                            <% const filterAmenities=["Wifi", "AC" , "Pool" , "Parking" ]; %>
-                                                <% for(let amenity of filterAmenities) { %>
-                                                    <div class="col-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="amenities" value="<%= amenity %>"
-                                                                id="f_<%= amenity %>" <%=(values && values.amenities &&
-                                                                values.amenities.includes(amenity)) ? 'checked' : '' %>>
-                                                            <label class="form-check-label" for="f_<%= amenity %>">
-                                                                <%= amenity %>
-                                                            </label>
-                                                        </div>
+                                    <h6>Amenities</h6>
+                                    <div class="row">
+                                        <% const filterAmenities=["Wifi", "AC" , "Pool" , "Parking" ]; %>
+                                            <% for(let amenity of filterAmenities) { %>
+                                                <div class="col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            name="amenities" value="<%= amenity %>"
+                                                            id="f_<%= amenity %>" <%=(values && values.amenities &&
+                                                            values.amenities.includes(amenity)) ? 'checked' : '' %>>
+                                                        <label class="form-check-label" for="f_<%= amenity %>">
+                                                            <%= amenity %>
+                                                        </label>
                                                     </div>
-                                                    <% } %>
-                                        </div>
+                                                </div>
+                                                <% } %>
+                                    </div>
                     </div>
                     <div class="modal-footer">
                         <a href="/listings" class="btn btn-secondary">Clear All</a>

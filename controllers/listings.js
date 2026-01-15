@@ -7,16 +7,11 @@ const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index = async (req, res) => {
-    let { search, category, min_price, max_price, guests, amenities, checkIn, checkOut } = req.query;
+    let { search, category, min_price, max_price, guests, amenities, checkIn, checkOut, page } = req.query;
     let query = {};
 
     if (search) {
-        const regex = new RegExp(search, 'i');
-        query.$or = [
-            { title: regex }, 
-            { location: regex }, 
-            { country: regex } 
-        ];
+        query.$text = { $search: search };
     }
 
     if (category && category !== "undefined") {
@@ -54,7 +49,21 @@ module.exports.index = async (req, res) => {
         }
     }
 
-    const allListings = await Listing.find(query);
+    // Pagination Logic
+    const pageNum = parseInt(page) || 1;
+    const limit = 12;
+    const skip = (pageNum - 1) * limit;
+
+    const totalListings = await Listing.countDocuments(query);
+    const totalPages = Math.ceil(totalListings / limit);
+
+    // Fetch Listings
+    let listingQuery = Listing.find(query);
+    if (search) {
+        listingQuery = listingQuery.sort({ score: { $meta: "textScore" } });
+    }
+
+    const allListings = await listingQuery.skip(skip).limit(limit);
 
     let amenitiesForView = [];
     if (amenities) {
@@ -63,7 +72,9 @@ module.exports.index = async (req, res) => {
 
     res.render("listings/index.ejs", { 
         allListings, 
-        values: { search, category, min_price, max_price, guests, amenities: amenitiesForView, checkIn, checkOut } 
+        values: { search, category, min_price, max_price, guests, amenities: amenitiesForView, checkIn, checkOut },
+        currentPage: pageNum,
+        totalPages
     });
 }
 
@@ -111,7 +122,6 @@ module.exports.edit = async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
 
-    // FIX: Add 'return' here as well
     if (!listing) {
         req.flash("error", "Listing does not exist!");
         return res.redirect("/listings");

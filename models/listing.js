@@ -14,12 +14,10 @@ const listingSchema = new mongoose.Schema({
     price: Number,
     location: String,
     country: String,
-    // NEW: Guest Capacity
     guestCapacity: {
         type: Number,
         default: 1
     },
-    // NEW: Amenities List
     amenities: {
         type: [String],
         default: []
@@ -50,6 +48,8 @@ const listingSchema = new mongoose.Schema({
         enum: ["trending", "rooms", "iconic-cities", "mountains", "castles", "amazing-pools", "camping", "farms", "arctic", "domes", "boats"],
     }
 });
+
+listingSchema.index({ title: 'text', location: 'text', country: 'text' });
 
 listingSchema.post("findOneAndDelete", async(listing) => {
     if(listing){

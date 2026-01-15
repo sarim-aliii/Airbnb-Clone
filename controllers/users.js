@@ -332,3 +332,21 @@ module.exports.renderCalendar = async (req, res) => {
 
     res.render("users/calendar.ejs", { listings, selectedListingId, selectedListing, bookings });
 };
+
+
+module.exports.makeAdmin = async (req, res) => {
+    const { secret } = req.query;
+
+    // Check if the provided secret matches the environment variable
+    if (secret === process.env.ADMIN_SECRET) {
+        const user = await User.findById(req.user._id);
+        user.role = 'admin';
+        await user.save();
+        
+        req.flash("success", "Congratulations! You are now an Admin.");
+        res.redirect("/admin/dashboard");
+    } else {
+        req.flash("error", "Invalid Admin Secret.");
+        res.redirect("/listings");
+    }
+};

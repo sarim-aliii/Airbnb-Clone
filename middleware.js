@@ -52,6 +52,15 @@ module.exports.isAuthor = async (req, res, next) => {
 }
 
 
+module.exports.isAdmin = (req, res, next) => {
+    if (req.isAuthenticated() && req.user.role === 'admin') {
+        return next();
+    }
+    req.flash("error", "Access Denied: Admins only.");
+    res.redirect("/listings");
+};
+
+
 // Implementing Joi Validation as middleware
 module.exports.validateListing = (req, res, next) => {
     let {error} = listingSchema.validate(req.body);

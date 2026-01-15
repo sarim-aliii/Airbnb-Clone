@@ -12,9 +12,14 @@ const userSchema = new Schema({
     image: {
         url: {
             type: String,
-            default: "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80" // Default dummy image
+            default: "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80"
         },
         filename: String,
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     },
     googleId: {
         type: String,
@@ -31,7 +36,7 @@ const userSchema = new Schema({
     resetPasswordExpires: Date,
     isVerified: {
         type: Boolean,
-        default: false // Default is false until they verify
+        default: false
     },
     verificationToken: String,
 });
