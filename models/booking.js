@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+
 const bookingSchema = new Schema({
     listing: {
         type: Schema.Types.ObjectId,
@@ -24,9 +25,13 @@ const bookingSchema = new Schema({
         type: Number,
         default: 0,
     },
+    paymentId: { 
+        type: String, 
+        required: true 
+    },
     status: {
         type: String,
-        enum: ['booked', 'blocked', 'cancelled'],
+        enum: ['booked', 'blocked', 'pending', 'cancelled'],
         default: 'booked'
     },
     createdAt: {

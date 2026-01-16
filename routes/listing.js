@@ -31,7 +31,7 @@ router.route("/:id")
     .put(
         isLoggedIn, 
         isOwner, 
-        upload.single('listing[image]'),
+        upload.array('listing[image]', 5),
         validateListing,
         wrapAsync(listingController.update)
     )

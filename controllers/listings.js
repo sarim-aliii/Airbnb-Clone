@@ -1,3 +1,4 @@
+// controllers/listings.js
 const Listing = require("../models/listing");
 const Booking = require("../models/booking");
 
@@ -105,13 +106,14 @@ module.exports.create = async (req, res, next) => {
     })
     .send();
 
-    let url = req.file.path;
-    let filename = req.file.filename;
-
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
-    newListing.image = { url, filename };
     newListing.geometry = response.body.features[0].geometry;
+
+    // Handle Multiple Images
+    if (req.files) {
+        newListing.image = req.files.map(f => ({ url: f.path, filename: f.filename }));
+    }
 
     await newListing.save();
     req.flash("success", "New Listing Created!");
@@ -127,20 +129,18 @@ module.exports.edit = async (req, res) => {
         return res.redirect("/listings");
     }
 
-    let originalImageUrl = listing.image.url;
-    originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-
-    res.render("listings/edit.ejs", { listing, originalImageUrl });
+    // Removed the originalImageUrl logic as the view will now loop through the array
+    res.render("listings/edit.ejs", { listing });
 }
 
 module.exports.update = async (req, res) => {
-    let {id} = req.params;
-    let listing = await Listing.findByIdAndUpdate(id, {...req.body.listing});
+    let { id } = req.params;
+    let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
 
-    if(typeof req.file !== 'undefined'){
-        let url = req.file.path;
-        let filename = req.file.filename;
-        listing.image = {url, filename};
+    // Handle Multiple Images Update (Replace existing)
+    if (req.files && req.files.length > 0) {
+        const newImages = req.files.map(f => ({ url: f.path, filename: f.filename }));
+        listing.image = newImages; 
         await listing.save();
     }
     

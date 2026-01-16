@@ -6,12 +6,13 @@
             <form method="POST" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
-                    <input name="listing[title]" placeholder="Add a catchy title" type="text" class="form-control" required>
+                    <input name="listing[title]" placeholder="Add a catchy title" type="text" class="form-control"
+                        required>
                     <div class="valid-feedback">
                         Title looks good!
                     </div>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea name="listing[description]" type="text" class="form-control" required></textarea>
@@ -21,8 +22,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="image" class="form-label">Upload Image</label>
-                    <input name="listing[image]" type="file" class="form-control" required>
+                    <label for="image" class="form-label">Upload Images</label>
+                    <input name="listing[image]" type="file" class="form-control" multiple required>
                 </div>
 
                 <div class="row">
@@ -33,7 +34,7 @@
                             Price should be valid
                         </div>
                     </div>
-                    
+
                     <div class="mb-3 col-md-8">
                         <label for="country" class="form-label">Country</label>
                         <input name="listing[country]" placeholder="India" type="text" class="form-control" required>
@@ -45,7 +46,8 @@
 
                 <div class="mb-3">
                     <label for="location" class="form-label">Location</label>
-                    <input name="listing[location]" placeholder="Enter location..."  type="text" class="form-control" required>
+                    <input name="listing[location]" placeholder="Enter location..." type="text" class="form-control"
+                        required>
                     <div class="invalid-feedback">
                         Location should be valid
                     </div>
@@ -61,25 +63,29 @@
                     <div class="row">
                         <div class="col-6 col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Wifi" id="wifi">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Wifi"
+                                    id="wifi">
                                 <label class="form-check-label" for="wifi">Wifi</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="AC" id="ac">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="AC"
+                                    id="ac">
                                 <label class="form-check-label" for="ac">AC</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Pool" id="pool">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Pool"
+                                    id="pool">
                                 <label class="form-check-label" for="pool">Pool</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Parking" id="parking">
+                                <input class="form-check-input" type="checkbox" name="listing[amenities][]"
+                                    value="Parking" id="parking">
                                 <label class="form-check-label" for="parking">Parking</label>
                             </div>
                         </div>
